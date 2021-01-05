@@ -17,6 +17,7 @@ import socket
 import json
 import sys
 import threading
+import importlib
 
 from .tcp_sender import UnityTcpSender
 from .client import ClientThread
@@ -50,6 +51,9 @@ class TcpServer:
         self.buffer_size = buffer_size
         self.connections = connections
         self.syscommands = SysCommands(self)
+        self.keep_connections = False
+        self.timeout_in_seconds = 5.0
+        
 
     def start(self):
         server_thread = threading.Thread(target=self.listen_loop)
@@ -132,6 +136,11 @@ class SysCommands:
             self.tcp_server.source_destination_dict[topic].unregister()
         
         self.tcp_server.source_destination_dict[topic] = RosPublisher(topic, message_class, queue_size=10)
+    
+    def connections_parameters(self, keep_connections, timeout_in_s):
+        self.tcp_server.keep_connections = keep_connections
+        self.tcp_server.timeout_in_seconds = timeout_in_s
+        rospy.loginfo("ConnectionsParameters({}, {}) OK".format(keep_connections, timeout_in_s))
 
 
 def resolve_message_name(name):
@@ -139,6 +148,7 @@ def resolve_message_name(name):
         names = name.split('/')
         module_name = names[0]
         class_name = names[1]
+        importlib.import_module(module_name+ ".msg")
         module = sys.modules[module_name]
         if module is None:
             rospy.loginfo("Failed to resolve module {}".format(module_name))
