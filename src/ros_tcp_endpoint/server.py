@@ -53,12 +53,14 @@ class TcpServer:
         self.syscommands = SysCommands(self)
         self.keep_connections = False
         self.timeout_in_seconds = 5.0
+        rospy.loginfo("Test server init")
         
 
     def start(self):
         server_thread = threading.Thread(target=self.listen_loop)
         # Exit the server thread when the main thread terminates
         server_thread.daemon = True
+        rospy.loginfo("Test start server")
         server_thread.start()
         
     def listen_loop(self):
@@ -160,5 +162,5 @@ def resolve_message_name(name):
             rospy.loginfo("Failed to resolve module {}.msg.{}".format(module_name, class_name))
         return module
     except (IndexError, KeyError, AttributeError) as e:
-        rospy.loginfo("Exception Raised: {}".format(e))
+        rospy.logerr("Exception Raised: {}".format(e))
         return None

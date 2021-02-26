@@ -19,6 +19,7 @@ def main():
 
     # Start the Server Endpoint
     rospy.init_node(ros_node_name, anonymous=True)
+    rospy.loginfo("Test start tcp server")
     tcp_server.start()
     rospy.spin()
 
